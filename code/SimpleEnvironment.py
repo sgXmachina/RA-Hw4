@@ -64,6 +64,7 @@ class SimpleEnvironment(object):
         snapped_config[:2] -= start_config[:2]
         footprint.append(snapped_config)
 
+
         return footprint
 
     def PlotActionFootprints(self, idx):
@@ -95,12 +96,12 @@ class SimpleEnvironment(object):
 
 
 
-        controls = [[ 1,1,1],
-                    [-1,-1,1],
-                    [-1,1,1],
-                    [1,-1,1],
-                    [1,1.414,1],
-                    [1.414,1,1]]
+        controls = [[ 1,1,5],
+                    [-1,-1,5],
+                    [-1,1,5],
+                    [1,-1,5],
+                    [1,1.414,5],
+                    [1.414,1,5]]
         # Iterate through each possible starting orientation
         for idx in range(int(self.discrete_env.num_cells[2])):
             self.actions[idx] = []
@@ -112,7 +113,9 @@ class SimpleEnvironment(object):
                 footprint= self.GenerateFootprintFromControl(start_config,ctrl)
                 self.actions[idx].append(Action(ctrl,footprint))
          
-            
+        # for j in range(len(self.actions)):
+        #     self.PlotActionFootprints(j)
+
 
     def GetSuccessors(self, node_id):
 

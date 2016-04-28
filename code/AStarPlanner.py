@@ -91,7 +91,7 @@ class AStarPlanner(object):
 
                 for i in xrange(len(successor_action.footprint)):
 
-                    successor = self.planning_env.discrete_env.ConfigurationToNodeId(successor_action.footprint[i])
+                   # successor = self.planning_env.discrete_env.ConfigurationToNodeId(successor_action.footprint[-1])
                     if(successor in closed_set):
                         continue
                     else:
