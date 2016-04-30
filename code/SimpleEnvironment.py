@@ -1,7 +1,6 @@
 import numpy, openravepy
 import pylab as pl
 from DiscreteEnvironment import DiscreteEnvironment
-import copy
 
 class Control(object):
     def __init__(self, omega_left, omega_right, duration):
@@ -34,7 +33,7 @@ class SimpleEnvironment(object):
         dt = control.dt
 
         # Initialize the footprint
-        config = copy.copy(start_config)
+        config = start_config.copy()
         footprint = [numpy.array([0., 0., config[2]])]
         timecount = 0.0
         while timecount < dt:
@@ -63,7 +62,6 @@ class SimpleEnvironment(object):
         snapped_config = self.discrete_env.NodeIdToConfiguration(nid)
         snapped_config[:2] -= start_config[:2]
         footprint.append(snapped_config)
-
 
         return footprint
 
@@ -94,28 +92,17 @@ class SimpleEnvironment(object):
         wc = [0., 0., 0.]
         grid_coordinate = self.discrete_env.ConfigurationToGridCoord(wc)
 
-
-
-        controls = [[ 1,1,5],
-                    [-1,-1,5],
-                    [-1,1,5],
-                    [1,-1,5],
-                    [1,1.414,5],
-                    [1.414,1,5]]
         # Iterate through each possible starting orientation
         for idx in range(int(self.discrete_env.num_cells[2])):
             self.actions[idx] = []
             grid_coordinate[2] = idx
-            start_config = numpy.asarray(self.discrete_env.GridCoordToConfiguration(grid_coordinate))
-            for i in range(len(controls)):
+            start_config = self.discrete_env.GridCoordToConfiguration(grid_coordinate)
 
-                ctrl=Control(controls[i][0],controls[i][1],controls[i][2])
-                footprint= self.GenerateFootprintFromControl(start_config,ctrl)
-                self.actions[idx].append(Action(ctrl,footprint))
+            # TODO: Here you will construct a set of actions
+            #  to be used during the planning process
+            #
          
-        # for j in range(len(self.actions)):
-        #     self.PlotActionFootprints(j)
-
+            
 
     def GetSuccessors(self, node_id):
 
@@ -125,26 +112,13 @@ class SimpleEnvironment(object):
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids and controls that represent the neighboring
         #  nodes
-
-        config = numpy.asarray(self.discrete_env.NodeIdToConfiguration(node_id))
-        orientation= self.discrete_env.NodeIdToGridCoord(node_id)[2]
-
-        # if orientation==8:
-        #     print("")
-        for i in (self.actions[orientation]):
-            footprint = self.GenerateFootprintFromControl(config,i.control)
-            successors.append(Action(i.control,footprint))
+        
         return successors
 
     def ComputeDistance(self, start_id, end_id):
 
         dist = 0
 
-
-        start_config = numpy.array(self.discrete_env.NodeIdToConfiguration(start_id))
-        end_config = numpy.array(self.discrete_env.NodeIdToConfiguration(end_id))
-
-        dist= numpy.linalg.norm(start_config - end_config, 2)
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
         # by the two node ids
@@ -158,16 +132,7 @@ class SimpleEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
-
-        D=1
-        D2= 1.414
-        #computing the octile distance
-        start_config = numpy.array(self.discrete_env.NodeIdToConfiguration(start_id))
-        end_config = numpy.array(self.discrete_env.NodeIdToConfiguration(goal_id))
-
-        dx = abs(start_config[0] - end_config[0])
-        dy = abs(start_config[1] - end_config[1])
-        cost = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
-
+        
+        
         return cost
 
