@@ -91,9 +91,9 @@ class AStarPlanner(object):
             #print successors 
             #print "\n\n"
             for successor_action in successors:
-
 #                for i in xrange(len(successor_action.footprint)):
-
+                # NOTE: the following footprint does not have relative position, Hence we don't need to
+                # add the current_config
                 successor = self.planning_env.discrete_env.ConfigurationToNodeId(successor_action.footprint[-1])
                 if(successor in closed_set):
                     continue
@@ -118,7 +118,10 @@ class AStarPlanner(object):
                         pred_config = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
                         succ_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
                         self.planning_env.PlotEdge(pred_config, succ_config)
-
+#            print "Open set: " , open_set , "\n"
+#            print "Closed set:"
+#            print closed_set            
+#            print "\n"
         if found_goal:
             # Find the path in reverse from goal
             curr_id = goal_id
@@ -133,7 +136,7 @@ class AStarPlanner(object):
             return plan[::-1] # reverse the plan
 
         else:
-            print("Failed to Find Goal")
-            print closed_set 
-            print '\n\n'
+#            print("Failed to Find Goal")
+#            print closed_set 
+#            print '\n\n'
             return [] # Failure
