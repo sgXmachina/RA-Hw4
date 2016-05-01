@@ -87,34 +87,37 @@ class AStarPlanner(object):
 
             # Find a non-visited successor to the current_id
             successors = self.planning_env.GetSuccessors(curr_id)
+            #print "successors:" 
+            #print successors 
+            #print "\n\n"
             for successor_action in successors:
 
-                for i in xrange(len(successor_action.footprint)):
+#                for i in xrange(len(successor_action.footprint)):
 
-                   # successor = self.planning_env.discrete_env.ConfigurationToNodeId(successor_action.footprint[-1])
-                    if(successor in closed_set):
+                successor = self.planning_env.discrete_env.ConfigurationToNodeId(successor_action.footprint[-1])
+                if(successor in closed_set):
+                    continue
+                else:
+                    # Calculate the tentative g score
+                    successor_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
+                    g_score = g_scores[curr_id] + self.planning_env.ComputeDistance(curr_id, successor)
+                    if successor not in open_set:
+                        # Add to open set
+                        open_set.append(successor)
+                    elif g_score >= g_scores[successor]:
                         continue
-                    else:
-                        # Calculate the tentative g score
-                        successor_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
-                        g_score = g_scores[curr_id] + self.planning_env.ComputeDistance(curr_id, successor)
-                        if successor not in open_set:
-                            # Add to open set
-                            open_set.append(successor)
-                        elif g_score >= g_scores[successor]:
-                            continue
 
-                        # Update g and f scores
-                        g_scores[successor] = g_score
-                        f_scores[successor] = g_score + self.planning_env.ComputeHeuristicCost(successor, goal_id)
+                    # Update g and f scores
+                    g_scores[successor] = g_score
+                    f_scores[successor] = g_score + self.planning_env.ComputeHeuristicCost(successor, goal_id)
 
-                        # Store the parent and child
-                        self.nodes[successor] = [successor_action,curr_id]
+                    # Store the parent and child
+                    self.nodes[successor] = [successor_action,curr_id]
 
-                        if self.visualize: # Plot the edge
-                            pred_config = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
-                            succ_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
-                            self.planning_env.PlotEdge(pred_config, succ_config)
+                    if self.visualize: # Plot the edge
+                        pred_config = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
+                        succ_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
+                        self.planning_env.PlotEdge(pred_config, succ_config)
 
         if found_goal:
             # Find the path in reverse from goal
@@ -131,4 +134,6 @@ class AStarPlanner(object):
 
         else:
             print("Failed to Find Goal")
+            print closed_set 
+            print '\n\n'
             return [] # Failure

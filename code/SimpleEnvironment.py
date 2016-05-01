@@ -60,11 +60,9 @@ class SimpleEnvironment(object):
             
         # Add one more config that snaps the last point in the footprint to the center of the cell
         nid = self.discrete_env.ConfigurationToNodeId(config)
-        snapped_config = self.discrete_env.NodeIdToConfiguration(nid)
+        snapped_config = numpy.asarray(self.discrete_env.NodeIdToConfiguration(nid))
         snapped_config[:2] -= start_config[:2]
         footprint.append(snapped_config)
-
-
         return footprint
 
     def PlotActionFootprints(self, idx):
@@ -90,37 +88,32 @@ class SimpleEnvironment(object):
         # Actions is a dictionary that maps orientation of the robot to
         #  an action set
         self.actions = dict()
-              
         wc = [0., 0., 0.]
         grid_coordinate = self.discrete_env.ConfigurationToGridCoord(wc)
-
-
-
-        controls = [[ 1,1,5],
-                    [-1,-1,5],
-                    [-1,1,5],
-                    [1,-1,5],
-                    [1,1.414,5],
-                    [1.414,1,5]]
+        dur=1
+        controls = [[ 1,1,dur],
+                [-1,-1,dur],
+                [-1,1,dur],
+                [1,-1,dur],
+                [1,1.414,dur],
+                [1.414,1,dur]]
+    
         # Iterate through each possible starting orientation
         for idx in range(int(self.discrete_env.num_cells[2])):
             self.actions[idx] = []
             grid_coordinate[2] = idx
             start_config = numpy.asarray(self.discrete_env.GridCoordToConfiguration(grid_coordinate))
             for i in range(len(controls)):
-
                 ctrl=Control(controls[i][0],controls[i][1],controls[i][2])
                 footprint= self.GenerateFootprintFromControl(start_config,ctrl)
                 self.actions[idx].append(Action(ctrl,footprint))
-         
         # for j in range(len(self.actions)):
         #     self.PlotActionFootprints(j)
-
 
     def GetSuccessors(self, node_id):
 
         successors = []
-
+        lower_limits, upper_limits = self.boundary_limits
         # TODO: Here you will implement a function that looks
         #  up the configuration associated with the particular node_id
         #  and return a list of node_ids and controls that represent the neighboring
@@ -133,7 +126,23 @@ class SimpleEnvironment(object):
         #     print("")
         for i in (self.actions[orientation]):
             footprint = self.GenerateFootprintFromControl(config,i.control)
+            # iterate through footprint and check for range & collision violations
+            break_flag=0
+            for config in footprint:
+            	if config[0]<=lower_limits[0] or config[0]>=upper_limits[0] or \
+            	config[1]<=lower_limits[1] or config[1]>=upper_limits[1] or \
+            	config[2]<=lower_limits[2] or config[2]>=upper_limits[2] or \
+            	self.CollisionChecker(config):	
+            		print "rejectedConfig{"
+            		print config
+            		print "}"
+            		break_flag=1
+            		break
+            if break_flag:	
+            	continue;
+            print footprint[-1]
             successors.append(Action(i.control,footprint))
+        print "done"
         return successors
 
     def ComputeDistance(self, start_id, end_id):
@@ -171,3 +180,14 @@ class SimpleEnvironment(object):
 
         return cost
 
+    def CollisionChecker(self, node_config):
+        #config = self.discrete_env.GridCoordToConfiguration(node_coord)
+        config = node_config
+        config_pose = numpy.array([[ 1, 0,  0, config[0]], 
+                                   [ 0, 1,  0, config[1]], 
+                                   [ 0, 0,  1, 0], 
+                                   [ 0, 0,  0, 1]])
+        with self.robot.GetEnv():
+            self.robot.SetTransform(config_pose)
+        check = self.robot.GetEnv().CheckCollision(self.robot)
+        return check
