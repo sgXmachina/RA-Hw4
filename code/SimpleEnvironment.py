@@ -26,7 +26,7 @@ class SimpleEnvironment(object):
         self.resolution = resolution
         self.ConstructActions()
 
-    def GenerateFootprintFromControl(self, start_config, control, stepsize=0.1):
+    def GenerateFootprintFromControl(self, start_config, control, stepsize=0.01):
 
         # Extract the elements of the control
         ul = control.ul
@@ -100,14 +100,18 @@ class SimpleEnvironment(object):
                 [1,-1,turnDur],
                 [-1,1,2*turnDur],
                 [1,-1,2*turnDur],
-                [1,1.414,dur],
-                [1.414,1,dur],
+                [1,3,dur],
+                [3,1,dur],
+                [1,15,dur],
+                [15,1,dur],
+                [1,30,dur],
+                [30,1,dur],
                 [ 1,1,5*dur],
                 [-1,-1,5*dur],
-                # [-1,1,5*dur],
-                # [1,-1,5*dur],
-                [1,1.414,5*dur],
-                [1.414,1,5*dur]]
+                [1,3,5*dur],
+                [3,1,5*dur]]
+                #[1,10,5*dur],
+                #[10,1,5*dur]]
         # Iterate through each possible starting orientation
         for idx in range(int(self.discrete_env.num_cells[2])):
             self.actions[idx] = []
@@ -117,8 +121,8 @@ class SimpleEnvironment(object):
                 ctrl=Control(controls[i][0],controls[i][1],controls[i][2])
                 footprint= self.GenerateFootprintFromControl(start_config,ctrl)
                 self.actions[idx].append(Action(ctrl,footprint))
-        # for j in range(len(self.actions)):
-        #     self.PlotActionFootprints(j)
+        #for j in range(len(self.actions)):
+        #    self.PlotActionFootprints(j)
 
     def GetSuccessors(self, node_id):
 
