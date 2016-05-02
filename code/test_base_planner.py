@@ -67,6 +67,8 @@ if __name__ == "__main__":
     plan = planner.Plan(start_config, goal_config)
     traj = herb_base.ConvertPlanToTrajectory(plan)
 
+    herb_base.SetCurrentConfiguration(start_config)
+
     raw_input('Press any key to play trajectory')
     herb_base.ExecuteTrajectory(traj)
 

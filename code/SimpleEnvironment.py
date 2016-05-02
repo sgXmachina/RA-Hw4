@@ -26,13 +26,12 @@ class SimpleEnvironment(object):
         self.resolution = resolution
         self.ConstructActions()
 
-    def GenerateFootprintFromControl(self, start_config, control, stepsize=0.01):
+    def GenerateFootprintFromControl(self, start_config, control, stepsize=0.1):
 
         # Extract the elements of the control
         ul = control.ul
         ur = control.ur
         dt = control.dt
-
         # Initialize the footprint
         config = start_config.copy()
         footprint = [numpy.array([0., 0., config[2]])]

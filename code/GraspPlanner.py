@@ -1,5 +1,6 @@
 import logging, numpy, openravepy
 import pdb
+import time
 
 class GraspPlanner(object):
 
@@ -31,7 +32,6 @@ class GraspPlanner(object):
                       [0.              ,  0.              , 1,  0.  ],
                       [0.              ,  0.              , 0,  1.  ]])
 
-        pdb.set_trace()
         init_pose = self.base_planner.planning_env.herb.GetCurrentConfiguration()
         theta=init_pose[2]
         init_pose = numpy.array([[numpy.cos(theta), -numpy.sin(theta), 0, init_pose[0]],
@@ -51,11 +51,32 @@ class GraspPlanner(object):
         Tconfig = gmodel.getGlobalGraspTransform(validgrasp, collisionfree = True)
 
         irmodel=openravepy.databases.inversereachability.InverseReachabilityModel(robot = r)
+        irmodel.load()
+        densityfn,samplerfn,bounds = irmodel.computeBaseDistribution(Tconfig)
+        pdb.set_trace()
 
-
-        #densityfn, samplerfn,bounds = self.irmodel.com
-        
+        goals = []
+        numfailures = 0
+        N = 200
+        m = self.arm_planner.planning_env.herb.manip
         fo = openravepy.IkFilterOptions.CheckEnvCollisions
+        with r:
+            while len(goals) < N:
+                poses,jointstate = samplerfn(N-len(goals))
+                for pose in poses:
+                    r.SetTransform(pose)
+                    r.SetDOFValues(*jointstate)
+                    # validate that base is not in collision
+                    if not m.CheckIndependentCollision(openravepy.CollisionReport()):
+                        q = m.FindIKSolution(Tconfig,filteroptions=fo)
+                        if q is not None:
+                            values = r.GetDOFValues()
+                            values[m.GetArmIndices()] = q
+                            goals.append((Tconfig,pose,values))
+                        elif m.FindIKSolution(Tconfig,0) is None:
+                            numfailures += 1
+        
+
         grasp_config = self.arm_planner.planning_env.herb.manip.FindIKSolution(Tconfig, filteroptions=fo)
 
         r.SetTransform(init_pose)

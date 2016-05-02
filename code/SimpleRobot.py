@@ -1,4 +1,5 @@
 import numpy, openravepy, time
+import pdb
 
 class SimpleRobot(object):
 
@@ -17,6 +18,7 @@ class SimpleRobot(object):
 
     def SetCurrentConfiguration(self, config):
         
+        
         transform = [[numpy.cos(config[2]), -numpy.sin(config[2]), 0, config[0]],
                      [numpy.sin(config[2]),  numpy.cos(config[2]), 0, config[1]],
                      [0, 0, 1, 0],
@@ -25,6 +27,7 @@ class SimpleRobot(object):
 
     def ConvertPlanToTrajectory(self, plan):
         # Create a trajectory and insert all points
+        # pdb.set_trace()
         return plan
 
     def ExecuteTrajectory(self, traj, stepsize = 0.01):
@@ -36,7 +39,8 @@ class SimpleRobot(object):
 
             for fconfig in action.footprint:
                 new_config = list(fconfig)
-                new_config[:2] += config[:2]
+                #pdb.set_trace()
+                new_config[:2] += config[:2] * 0.1
                 self.SetCurrentConfiguration(new_config)
                 time.sleep(0.001)
 
