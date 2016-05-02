@@ -93,17 +93,20 @@ class SimpleEnvironment(object):
         wc = [0., 0., 0.]
         grid_coordinate = self.discrete_env.ConfigurationToGridCoord(wc)
         
-        dur=1
+        dur=0.1
+        turnDur= (3.141 / 1.6)
         controls = [[ 1,1,dur],
                 [-1,-1,dur],
-                [-1,1,dur],
-                [1,-1,dur],
+                [-1,1,turnDur],
+                [1,-1,turnDur],
+                [-1,1,2*turnDur],
+                [1,-1,2*turnDur],
                 [1,1.414,dur],
                 [1.414,1,dur],
                 [ 1,1,5*dur],
                 [-1,-1,5*dur],
-                [-1,1,5*dur],
-                [1,-1,5*dur],
+                # [-1,1,5*dur],
+                # [1,-1,5*dur],
                 [1,1.414,5*dur],
                 [1.414,1,5*dur]]
         # Iterate through each possible starting orientation
@@ -163,7 +166,10 @@ class SimpleEnvironment(object):
         dist = 0
         start_config = numpy.array(self.discrete_env.NodeIdToConfiguration(start_id))
         end_config = numpy.array(self.discrete_env.NodeIdToConfiguration(end_id))
-        dist= numpy.linalg.norm(start_config - end_config, 2)
+
+
+        dist = ((start_config[0] - end_config[0])**2 + (start_config[1] - end_config[1])**2)**0.5
+        # dist= numpy.linalg.norm(start_config - end_config, 2)
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
         # by the two node ids
