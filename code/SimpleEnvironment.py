@@ -92,7 +92,7 @@ class SimpleEnvironment(object):
         wc = [0., 0., 0.]
         grid_coordinate = self.discrete_env.ConfigurationToGridCoord(wc)
         
-        dur=0.2
+        dur=0.5
         turnDur= (3.141 / 1.6)
         controls = [[ 1,1,dur],
                 [-1,-1,dur],
@@ -102,10 +102,10 @@ class SimpleEnvironment(object):
                 [1,-1,2*turnDur],
                 [1,3,dur],
                 [3,1,dur],
-                [1,15,dur],
-                [15,1,dur],
-                [1,30,dur],
-                [30,1,dur],
+                [7,3.5,dur],
+                [3.5,7,dur],
+                # [15,30,dur],
+                # [30,15,dur],
                 [ 1,1,5*dur],
                 [-1,-1,5*dur],
                 [1,3,5*dur],
@@ -187,7 +187,7 @@ class SimpleEnvironment(object):
         # TODO: Here you will implement a function that 
         # computes the heuristic cost between the configurations
         # given by the two node ids
-        '''
+
         D=1
         D2= 1.414
         #computing the octile distance
@@ -197,8 +197,8 @@ class SimpleEnvironment(object):
         dx = abs(start_config[0] - end_config[0])
         dy = abs(start_config[1] - end_config[1])
         cost = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
-        '''
-        cost = self.ComputeDistance(start_id, goal_id)
+
+        # cost = self.ComputeDistance(start_id, goal_id)
         return cost
 
     def CollisionChecker(self, node_config):

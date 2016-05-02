@@ -53,9 +53,12 @@ class AStarPlanner(object):
         open_set.append(start_id)
         g_scores[start_id] = 0
         f_scores[start_id] = self.planning_env.ComputeHeuristicCost(start_id, goal_id)
+        visited=set()
+
 
         # initialize flags and counters
         found_goal = False
+        weight =10
 
         while len(open_set) != 0:
             # Get the element with the lowest f_score
@@ -75,7 +78,7 @@ class AStarPlanner(object):
 
             # Remove element from open set
             open_set.pop(min_idx)
-
+            visited.add(min_idx)
             # Check to see if you are at goal
             if(curr_id == goal_id):
                 found_goal = True
@@ -93,24 +96,35 @@ class AStarPlanner(object):
                 # NOTE: the following footprint does not have relative position, Hence we don't need to
                 # add the current_config
                 successor = self.planning_env.discrete_env.ConfigurationToNodeId(successor_action.footprint[-1])
+
                 if(successor in closed_set):
                     continue
                 else:
                     # Calculate the tentative g score
                     successor_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
                     g_score = g_scores[curr_id] + self.planning_env.ComputeDistance(curr_id, successor)
+
                     if successor not in open_set:
                         # Add to open set
-                        open_set.append(successor)
+                        if successor not in visited:
+                            visited.add(successor)
+                            open_set.append(successor)
+                            g_scores[successor] = g_score
+                            f_scores[successor] = g_score + weight*self.planning_env.ComputeHeuristicCost(successor, goal_id)
+                        else:
+
+                            if g_score < g_scores[successor]:
+                                open_set.append(successor)
+                                g_scores[successor] = g_score
+                                f_scores[successor] = g_score + weight*self.planning_env.ComputeHeuristicCost(successor, goal_id)
+
+                        # Store the action and the parent
+                        self.nodes[successor] = [successor_action,curr_id]
+
                     elif g_score >= g_scores[successor]:
                         continue
 
                     # Update g and f scores
-                    g_scores[successor] = g_score
-                    f_scores[successor] = g_score + self.planning_env.ComputeHeuristicCost(successor, goal_id)
-
-                    # Store the action and the parent
-                    self.nodes[successor] = [successor_action,curr_id]
 
                     # if self.visualize: # Plot the edge
                     #     pred_config = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
