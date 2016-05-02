@@ -145,7 +145,8 @@ class SimpleEnvironment(object):
             	if config[0]<=lower_limits[0] or config[0]>=upper_limits[0] or \
             	config[1]<=lower_limits[1] or config[1]>=upper_limits[1] or \
             	config[2]<=lower_limits[2] or config[2]>=upper_limits[2] or \
-            	self.CollisionChecker(config):	
+            	self.CollisionChecker(config):
+
 #            		print "rejectedConfig{"
 #            		print config
 #            		print "}"
@@ -168,7 +169,7 @@ class SimpleEnvironment(object):
         end_config = numpy.array(self.discrete_env.NodeIdToConfiguration(end_id))
 
 
-        dist = ((start_config[0] - end_config[0])**2 + (start_config[1] - end_config[1])**2)**0.5
+        dist = ((start_config[0] - end_config[0])**2 + (start_config[1] - end_config[1])**2 + (0.2*(start_config[2] - end_config[2]))**2 )**0.5
         # dist= numpy.linalg.norm(start_config - end_config, 2)
         # TODO: Here you will implement a function that 
         # computes the distance between the configurations given
