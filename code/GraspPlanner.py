@@ -1,4 +1,5 @@
 import logging, numpy, openravepy
+import pdb
 
 class GraspPlanner(object):
 
@@ -23,7 +24,44 @@ class GraspPlanner(object):
         #  a base pose and associated grasp config for the 
         #  grasping the bottle
         ###################################################################
+
+        theta=0
+        base_pose = numpy.array([[numpy.cos(theta), -numpy.sin(theta), 0, 0.0],
+                      [numpy.sin(theta),  numpy.cos(theta), 0,  0],
+                      [0.              ,  0.              , 1,  0.  ],
+                      [0.              ,  0.              , 0,  1.  ]])
+
+        pdb.set_trace()
+        init_pose = self.base_planner.planning_env.herb.GetCurrentConfiguration()
+        theta=init_pose[2]
+        init_pose = numpy.array([[numpy.cos(theta), -numpy.sin(theta), 0, init_pose[0]],
+                      [numpy.sin(theta),  numpy.cos(theta), 0,  init_pose[1]],
+                      [0.              ,  0.              , 1,  0.  ],
+                      [0.              ,  0.              , 0,  1.  ]])
+
+        r = self.base_planner.planning_env.herb.robot
+        r.SetTransform(base_pose)
+
+        validgrasps, validindices = gmodel.computeValidGrasps(returnnum = 3)
         
+        # Todo select best grasp from valid grasp list
+        validgrasp = validgrasps[0]
+        #gmodel.showgrasp(validgrasp)
+
+        Tconfig = gmodel.getGlobalGraspTransform(validgrasp, collisionfree = True)
+
+        irmodel=openravepy.databases.inversereachability.InverseReachabilityModel(robot = r)
+
+
+        #densityfn, samplerfn,bounds = self.irmodel.com
+        
+        fo = openravepy.IkFilterOptions.CheckEnvCollisions
+        grasp_config = self.arm_planner.planning_env.herb.manip.FindIKSolution(Tconfig, filteroptions=fo)
+
+        r.SetTransform(init_pose)
+        theta=0
+        base_pose = numpy.array([0,0,0]);
+
         return base_pose, grasp_config
 
     def PlanToGrasp(self, obj):
@@ -35,11 +73,22 @@ class GraspPlanner(object):
             print 'Failed to find solution'
             exit()
 
+
+        init_pose = self.base_planner.planning_env.herb.GetCurrentConfiguration()
         # Now plan to the base pose
         start_pose = numpy.array(self.base_planner.planning_env.herb.GetCurrentConfiguration())
         base_plan = self.base_planner.Plan(start_pose, base_pose)
         base_traj = self.base_planner.planning_env.herb.ConvertPlanToTrajectory(base_plan)
 
+        theta=init_pose[2]
+        init_pose = numpy.array([[numpy.cos(theta), -numpy.sin(theta), 0, init_pose[0]],
+                      [numpy.sin(theta),  numpy.cos(theta), 0,  init_pose[1]],
+                      [0.              ,  0.              , 1,  0.  ],
+                      [0.              ,  0.              , 0,  1.  ]])
+        r = self.base_planner.planning_env.herb.robot
+        r.SetTransform(init_pose)
+
+        pdb.set_trace()
         print 'Executing base trajectory'
         self.base_planner.planning_env.herb.ExecuteTrajectory(base_traj)
 
@@ -53,5 +102,5 @@ class GraspPlanner(object):
 
         # Grasp the bottle
         task_manipulation = openravepy.interfaces.TaskManipulation(self.robot)
-        task_manipultion.CloseFingers()
+        task_manipulation.CloseFingers()
     

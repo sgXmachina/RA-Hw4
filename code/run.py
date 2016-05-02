@@ -8,7 +8,9 @@ from SimpleRobot import SimpleRobot
 from SimpleEnvironment import SimpleEnvironment
 from GraspPlanner import GraspPlanner
 from AStarPlanner import AStarPlanner
-# TODO: Import the applicable RRTPlanner
+from RRTPlanner import RRTPlanner
+
+import pdb
 
 if __name__ == "__main__":
     
@@ -42,7 +44,8 @@ if __name__ == "__main__":
     env.Add(robot)
         
     theta = -numpy.pi/4.
-    robot_pose = numpy.array([[numpy.cos(theta), -numpy.sin(theta), 0, -1.25],
+    theta = 0
+    robot_pose = numpy.array([[numpy.cos(theta), -numpy.sin(theta), 0, -3],
                               [numpy.sin(theta),  numpy.cos(theta), 0,  0.82],
                               [0.              ,  0.              , 1,  0.  ],
                               [0.              ,  0.              , 0,  1.  ]])
@@ -76,23 +79,23 @@ if __name__ == "__main__":
     base_env = SimpleEnvironment(herb_base, resolution)
 
     base_planner = AStarPlanner(base_env, visualize = False)
-    arm_planner = None
-    # TODO: Here initialize your arm planner
+    arm_planner = RRTPlanner(arm_env, visualize = False)
   
-    # add a table and move the robot into place
-    table = env.ReadKinBodyXMLFile('models/objects/table.kinbody.xml')
-    env.Add(table)
+    #pdb.set_trace()
+    # # add a table and move the robot into place
+    table2 = env.ReadKinBodyXMLFile('models/objects/table.kinbody.xml')
+    #env.Add(table2)
     
-    table_pose = numpy.array([[ 0, 0, -1, 0.7], 
-                              [-1, 0,  0, 0], 
-                              [ 0, 1,  0, 0], 
-                              [ 0, 0,  0, 1]])
-    table.SetTransform(table_pose)
+    table_pose = numpy.array([[ 0, 0, -1, 0.5], 
+                               [-1, 0,  0, 0], 
+                               [ 0, 1,  0, 0], 
+                               [ 0, 0,  0, 1]])
+    table2.SetTransform(table_pose)
 
-    # set a bottle on the table
+    # # set a bottle on the table
     bottle = herb.robot.GetEnv().ReadKinBodyXMLFile('models/objects/fuze_bottle.kinbody.xml')
     herb.robot.GetEnv().Add(bottle)
-    table_aabb = table.ComputeAABB()
+    table_aabb = table2.ComputeAABB()
     bottle_transform = bottle.GetTransform()
     bottle_transform[2,3] = table_aabb.pos()[2] + table_aabb.extents()[2]
 
@@ -102,6 +105,8 @@ if __name__ == "__main__":
         bottle_transform[0,3] = table_aabb.pos()[0] - 0.5*table_aabb.extents()[0]
         bottle_transform[1,3] = table_aabb.pos()[1] - 0.5*table_aabb.extents()[1]
     elif args.test == 3:
+        bottle_transform[0,3] = table_aabb.pos()[0] - 3.5*table_aabb.extents()[0]
+        bottle_transform[1,3] = table_aabb.pos()[1] + 1.25*table_aabb.extents()[1]
         bottle_transform[0,3] = table_aabb.pos()[0] + 0.5*table_aabb.extents()[0]
         bottle_transform[1,3] = table_aabb.pos()[1] + 0.5*table_aabb.extents()[1]
 
