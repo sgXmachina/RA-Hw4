@@ -30,7 +30,7 @@ class SimpleRobot(object):
         # pdb.set_trace()
         return plan
 
-    def ExecuteTrajectory(self, traj, stepsize = 0.1):
+    def ExecuteTrajectory(self, traj, stepsize = 0.05):
         
         # Send the trajectory to the controller and wait for execution to complete
         offset = None
@@ -51,7 +51,7 @@ class SimpleRobot(object):
                 new_config = list(fconfig)
 
                 #pdb.set_trace()
-                new_config[:2] += config[:2] * 0.1
+                new_config[:2] += config[:2] * stepsize
 
                 self.SetCurrentConfiguration(new_config)
                 time.sleep(0.001)
