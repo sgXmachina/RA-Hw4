@@ -87,9 +87,7 @@ class AStarPlanner(object):
 
             # Find a non-visited successor to the current_id
             successors = self.planning_env.GetSuccessors(curr_id)
-            #print "successors:" 
-            #print successors 
-            #print "\n\n"
+
             for successor_action in successors:
 #                for i in xrange(len(successor_action.footprint)):
                 # NOTE: the following footprint does not have relative position, Hence we don't need to
@@ -111,13 +109,13 @@ class AStarPlanner(object):
                     g_scores[successor] = g_score
                     f_scores[successor] = g_score + self.planning_env.ComputeHeuristicCost(successor, goal_id)
 
-                    # Store the parent and child
+                    # Store the action and the parent
                     self.nodes[successor] = [successor_action,curr_id]
 
-                    if self.visualize: # Plot the edge
-                        pred_config = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
-                        succ_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
-                        self.planning_env.PlotEdge(pred_config, succ_config)
+                    # if self.visualize: # Plot the edge
+                    #     pred_config = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
+                    #     succ_config = self.planning_env.discrete_env.NodeIdToConfiguration(successor)
+                    #     self.planning_env.PlotEdge(pred_config, succ_config)
 #            print "Open set: " , open_set , "\n"
 #            print "Closed set:"
 #            print closed_set            
@@ -127,13 +125,17 @@ class AStarPlanner(object):
             curr_id = goal_id
             while(curr_id != start_id):
                 curr_confg = self.planning_env.discrete_env.NodeIdToConfiguration(curr_id)
+                # self.nodes[curr_id][0].control.ul*=-1;
+                # self.nodes[curr_id][0].control.ur*=-1;
                 plan.append(self.nodes[curr_id][0])
                 curr_id = self.nodes[curr_id][1] # Get the vertex opposite the edge of the current id
 
+
             # Whenever the current id is the start id, append start id
-            #plan.append(self.nodes[start_id][0])
+            # plan.append(self.nodes[start_id][0])
 
             return plan[::-1] # reverse the plan
+            # return plan
 
         else:
 #            print("Failed to Find Goal")

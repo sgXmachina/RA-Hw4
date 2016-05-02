@@ -92,7 +92,7 @@ class SimpleEnvironment(object):
         wc = [0., 0., 0.]
         grid_coordinate = self.discrete_env.ConfigurationToGridCoord(wc)
         
-        dur=0.1
+        dur=0.2
         turnDur= (3.141 / 1.6)
         controls = [[ 1,1,dur],
                 [-1,-1,dur],

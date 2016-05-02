@@ -70,6 +70,7 @@ if __name__ == "__main__":
     herb_base.SetCurrentConfiguration(start_config)
 
     raw_input('Press any key to play trajectory')
+
     herb_base.ExecuteTrajectory(traj)
 
     raw_input('Press any key to quit.')
