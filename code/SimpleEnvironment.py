@@ -100,14 +100,14 @@ class SimpleEnvironment(object):
                 [1,-1,turnDur],
                 [-1,1,2*turnDur],
                 [1,-1,2*turnDur],
-                [1,1.414,dur],
-                [1.414,1,dur],
+                [1,3,dur],
+                [3,1,dur],
                 [ 1,1,5*dur],
                 [-1,-1,5*dur],
                 # [-1,1,5*dur],
                 # [1,-1,5*dur],
-                [1,1.414,5*dur],
-                [1.414,1,5*dur]]
+                [1,3,5*dur],
+                [3,1,5*dur]]
         # Iterate through each possible starting orientation
         for idx in range(int(self.discrete_env.num_cells[2])):
             self.actions[idx] = []

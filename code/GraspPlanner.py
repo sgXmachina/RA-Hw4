@@ -42,10 +42,11 @@ class GraspPlanner(object):
         r = self.base_planner.planning_env.herb.robot
         r.SetTransform(base_pose)
 
-        validgrasps, validindices = gmodel.computeValidGrasps(returnnum = 3)
+        validgrasps, validindices = gmodel.computeValidGrasps(returnnum = 7)
         
         # Todo select best grasp from valid grasp list
         validgrasp = validgrasps[0]
+        pdb.set_trace()
         #gmodel.showgrasp(validgrasp)
 
         Tconfig = gmodel.getGlobalGraspTransform(validgrasp, collisionfree = True)
@@ -53,11 +54,10 @@ class GraspPlanner(object):
         irmodel=openravepy.databases.inversereachability.InverseReachabilityModel(robot = r)
         irmodel.load()
         densityfn,samplerfn,bounds = irmodel.computeBaseDistribution(Tconfig)
-        pdb.set_trace()
 
         goals = []
         numfailures = 0
-        N = 200
+        N = 1000
         m = self.arm_planner.planning_env.herb.manip
         fo = openravepy.IkFilterOptions.CheckEnvCollisions
         with r:
@@ -76,12 +76,15 @@ class GraspPlanner(object):
                         elif m.FindIKSolution(Tconfig,0) is None:
                             numfailures += 1
         
+        r.SetTransform(goals[0][1])
+
+        pdb.set_trace()
 
         grasp_config = self.arm_planner.planning_env.herb.manip.FindIKSolution(Tconfig, filteroptions=fo)
 
         r.SetTransform(init_pose)
         theta=0
-        base_pose = numpy.array([0,0,0]);
+        base_pose = goals[0][1]
 
         return base_pose, grasp_config
 

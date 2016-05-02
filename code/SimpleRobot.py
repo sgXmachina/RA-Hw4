@@ -30,7 +30,7 @@ class SimpleRobot(object):
         # pdb.set_trace()
         return plan
 
-    def ExecuteTrajectory(self, traj, stepsize = 0.01):
+    def ExecuteTrajectory(self, traj, stepsize = 0.1):
         
         # Send the trajectory to the controller and wait for execution to complete
         offset = None
