@@ -68,6 +68,7 @@ if __name__ == "__main__":
     traj = herb_base.ConvertPlanToTrajectory(plan)
 
     raw_input('Press any key to play trajectory')
+
     herb_base.ExecuteTrajectory(traj)
 
     raw_input('Press any key to quit.')

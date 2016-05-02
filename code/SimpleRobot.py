@@ -31,12 +31,22 @@ class SimpleRobot(object):
         
         # Send the trajectory to the controller and wait for execution to complete
         offset = None
+        self.SetCurrentConfiguration(traj[0].footprint[0])
+
+        # for action in traj:
+        #     config = self.GetCurrentConfiguration()
+
+            # for fconfig in action.footprint:
+            #     new_config = fconfig.copy()
+            #     new_config[:2] += config[:2]
+            #     self.SetCurrentConfiguration(new_config)
+            #     time.sleep(0.001)
         for action in traj:
             config = self.GetCurrentConfiguration()
 
             for fconfig in action.footprint:
                 new_config = list(fconfig)
-                new_config[:2] += config[:2]
+                # new_config[:2] += config[:2]
                 self.SetCurrentConfiguration(new_config)
                 time.sleep(0.001)
 
